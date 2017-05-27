@@ -51,8 +51,8 @@ def poloniex(assets):
     for k, v in d.items():
         k1, k2 = k.split("_")
         if k1 in assets and k2 in assets:
-            retval.append({'from': k1,
-                           'to': k2,
+            retval.append({'from': k2,
+                           'to': k1,
                            'bid': v['highestBid'],
                            'ask': v['lowestAsk']})
     return retval
