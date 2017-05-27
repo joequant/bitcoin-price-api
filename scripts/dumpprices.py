@@ -91,7 +91,7 @@ def bitstamp(assets):
         d = requests.get(bitstamp_url + s +"/").json()
         k1 = s[0:3].upper()
         k2 = s[3:].upper()
-        if k1 not in assets or k2 not in assets:
+        if k1 in assets and k2 in assets:
             retval.append({'from': k1,
                            'to': k2,
                            'bid': d['bid'],
@@ -150,4 +150,4 @@ for k,v in [
         if j['from'] not in assets or j['to'] not in assets:
             continue
         j = add_tag(j,k)
-        print(','.join([j['from'], j['to'], str(j['bid']), str(j['ask'])]))
+        print(','.join(['bid-ask', j['from'], j['to'], str(j['bid']), str(j['ask'])]))
