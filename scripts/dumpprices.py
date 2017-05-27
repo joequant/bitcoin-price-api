@@ -2,7 +2,8 @@
 import requests
 import grequests
 
-assets = ['USD', 'USDT', 'EUR', 'BTC', 'XRP', 'ETH', 'HKD', 'LTC', 'RUR']
+assets = ['USD', 'USDT', 'EUR', 'BTC', 'XRP', 'ETH', 'HKD', 'LTC', 'RUR',
+          'CNY']
 
 #btce
 def btc_e(assets):
@@ -65,7 +66,7 @@ def bitfinex(assets):
     for s in symbols:
         k1 = s[0:3].upper()
         k2 = s[3:].upper()
-        if k1 in assets or k2 in assets:
+        if k1 in assets and k2 in assets:
             pairs.append(s)
             urls.append(bitfinex_url + '/pubticker/' + s)
     rs = [grequests.get(u) for u in urls]
@@ -96,6 +97,39 @@ def bitstamp(assets):
                            'bid': d['bid'],
                            'ask': d['ask']})
     return retval
+
+def bitcashout(assets):
+    retval = []
+    resp = requests.get('https://www.bitcashout.com/ticker.json').json()
+    for i in resp:
+        retval.append({'from':'BTC',
+                       'to': i['currency'].upper(),
+                       'bid': i['buy'],
+                       'ask': i['sell']})
+    return retval
+
+def anx(assets):
+    retval = []
+    urls = []
+    pairs = []
+    resp = requests.get('https://anxpro.com/api/3/currencyStatic').json()
+    for k, v in resp['currencyStatic']['currencyPairs'].items():
+        k1 = v['tradedCcy']
+        k2 = v['settlementCcy']
+        if k1 in assets and k2 in assets:
+            pairs.append([k1, k2])
+            urls.append('https://anxpro.com/api/2/%s/money/ticker' % k)
+        rs = [grequests.get(u) for u in urls]
+    for i in zip(pairs, grequests.map(rs)):
+        r = i[1].json()
+        k = i[0]
+        k1 = k[0]
+        k2 = k[1]
+        retval.append({'from': k1,
+                       'to': k2,
+                       'bid': float(r['data']['buy']['value']),
+                       'ask': float(r['data']['sell']['value'])})
+    return retval
     
 #add tag
 def add_tag(d, tag):
@@ -104,6 +138,8 @@ def add_tag(d, tag):
     return d
  
 for k,v in [
+    ['anx', anx],
+    ['bitcashout', bitcashout],
     ['bitfinex', bitfinex],
     ['btce', btc_e],
     ['gatecoin', gatecoin],
@@ -115,12 +151,3 @@ for k,v in [
             continue
         j = add_tag(j,k)
         print(','.join([j['from'], j['to'], str(j['bid']), str(j['ask'])]))
-
-
-
-#bitfinex
-
-#bitstamp
-
-#anx
-
