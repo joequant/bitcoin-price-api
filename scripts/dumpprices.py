@@ -4,7 +4,7 @@ import grequests
 import multiprocessing
 
 assets = ['USD', 'USDT', 'EUR', 'BTC', 'XRP', 'ETH', 'HKD', 'LTC', 'RUR',
-          'CNY']
+          'CNY', 'DASH', 'ZEC']
 
 #btce
 def btc_e(assets):
@@ -67,6 +67,10 @@ def bitfinex(assets):
     for s in symbols:
         k1 = s[0:3].upper()
         k2 = s[3:].upper()
+        if k1 == "DSH":
+            k1 = "DASH"
+        if k2 == "DSH":
+            k1 = "DASH"
         if k1 in assets and k2 in assets:
             pairs.append(s)
             urls.append(bitfinex_url + '/pubticker/' + s)
