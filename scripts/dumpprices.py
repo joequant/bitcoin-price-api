@@ -25,7 +25,8 @@ def btc_e(assets):
         retval.append({'from': k1,
                        'to': k2,
                        'bid': r[k]['buy'],
-                       'ask': r[k]['sell']})
+                       'ask': r[k]['sell'],
+                       'last': r[k]['last']})
     return retval
 
 
@@ -40,7 +41,8 @@ def gatecoin(assets):
             retval.append({'from': k1,
                            'to': k2,
                            'bid': k['bid'],
-                           'ask': k['ask']})
+                           'ask': k['ask'],
+                           'last' : k['last']})
     return retval
 
 def poloniex(assets):
@@ -54,7 +56,9 @@ def poloniex(assets):
             retval.append({'from': k2,
                            'to': k1,
                            'bid': v['highestBid'],
-                           'ask': v['lowestAsk']})
+                           'ask': v['lowestAsk'],
+                           'last': v['last']
+                           })
     return retval
 
 def bitfinex(assets):
@@ -83,7 +87,8 @@ def bitfinex(assets):
         retval.append({'from': k1,
                        'to': k2,
                        'bid': r['bid'],
-                       'ask': r['ask']})
+                       'ask': r['ask'],
+                       'last' : r['last_price']})
     return retval
 
 def bitstamp(assets):
@@ -100,7 +105,8 @@ def bitstamp(assets):
             retval.append({'from': k1,
                            'to': k2,
                            'bid': d['bid'],
-                           'ask': d['ask']})
+                           'ask': d['ask'],
+                           'last': d['last']})
     return retval
 
 def bitcashout(assets):
@@ -110,7 +116,9 @@ def bitcashout(assets):
         retval.append({'from':'BTC',
                        'to': i['currency'].upper(),
                        'bid': i['buy'],
-                       'ask': i['sell']})
+                       'ask': i['sell'],
+                       'last' : i['last_trade']['price']
+                       })
     return retval
 
 def anx(assets):
@@ -133,7 +141,8 @@ def anx(assets):
         retval.append({'from': k1,
                        'to': k2,
                        'bid': float(r['data']['buy']['value']),
-                       'ask': float(r['data']['sell']['value'])})
+                       'ask': float(r['data']['sell']['value']),
+                       'last': float(r['data']['last']['value'])})
     return retval
     
 #add tag
