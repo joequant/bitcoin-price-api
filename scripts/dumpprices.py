@@ -8,7 +8,6 @@ assets = ['USD', 'USDT', 'EUR', 'BTC', 'XRP', 'ETH', 'HKD', 'LTC', 'RUR',
 
 #btce
 def btc_e(assets):
-    retval = []
     r = requests.get('https://btc-e.com/api/3/info').json()
     urls=[]
     pairs = []
@@ -17,18 +16,16 @@ def btc_e(assets):
         if k1 in assets and k2 in assets:
             pairs.append(k)
             urls.append('https://btc-e.com/api/3/ticker/' + k)
-    rs = [grequests.get(u) for u in urls]
-    for i in zip(pairs, grequests.map(rs)):
-        r = i[1].json()
-        k = i[0]
+    def item(r):
+        k,v = r.popitem()
         k1, k2 = k.upper().split("_")
-        retval.append({'from': k1,
-                       'to': k2,
-                       'bid': r[k]['buy'],
-                       'ask': r[k]['sell'],
-                       'last': r[k]['last']})
-    return retval
-
+        return {'from': k1,
+                'to': k2,
+                'bid': v['buy'],
+                'ask': v['sell'],
+                'last': v['last']}
+    return [item(x.json()) for x in \
+            grequests.imap([grequests.get(u) for u in urls])]
 
 def gatecoin(assets):
     retval = []
@@ -93,33 +90,37 @@ def bitfinex(assets):
 
 def bitstamp(assets):
     """Bitstamp assets"""
-    retval = []
-    bitstamp_url = 'https://www.bitstamp.net/api/v2/ticker/'
-    for s in ['btcusd', 'btceur',
+    urls = []
+    symbols = ['btcusd', 'btceur',
               'eurusd', 'xrpusd', 'xrpeur',
-              'xrpbtc']:
-        d = requests.get(bitstamp_url + s +"/").json()
+              'xrpbtc']
+    bitstamp_url = 'https://www.bitstamp.net/api/v2/ticker/'
+    for s in symbols:
         k1 = s[0:3].upper()
         k2 = s[3:].upper()
         if k1 in assets and k2 in assets:
-            retval.append({'from': k1,
-                           'to': k2,
-                           'bid': d['bid'],
-                           'ask': d['ask'],
-                           'last': d['last']})
-    return retval
+            urls.append(bitstamp_url + s +"/")
+    rs = [grequests.get(u) for u in urls]
+    def item(i):
+        d = i[1].json()
+        k = i[0]
+        k1 = k[0:3].upper()
+        k2 = k[3:].upper()
+        return {'from': k1,
+                'to': k2,
+                'bid': d['bid'],
+                'ask': d['ask'],
+                'last': d['last']}
+    return [ item(x) for x in zip(symbols, grequests.map(rs)) ]
 
 def bitcashout(assets):
-    retval = []
-    resp = requests.get('https://www.bitcashout.com/ticker.json').json()
-    for i in resp:
-        retval.append({'from':'BTC',
-                       'to': i['currency'].upper(),
-                       'bid': i['buy'],
-                       'ask': i['sell'],
-                       'last' : i['last_trade']['price']
-                       })
-    return retval
+    return [{'from':'BTC',
+             'to': i['currency'].upper(),
+             'bid': i['buy'],
+             'ask': i['sell'],
+             'last' : i['last_trade']['price']
+             } for i in \
+            requests.get('https://www.bitcashout.com/ticker.json').json()]
 
 def anx(assets):
     retval = []
@@ -132,18 +133,14 @@ def anx(assets):
         if k1 in assets and k2 in assets:
             pairs.append([k1, k2])
             urls.append('https://anxpro.com/api/2/%s/money/ticker' % k)
-        rs = [grequests.get(u) for u in urls]
-    for i in zip(pairs, grequests.map(rs)):
-        r = i[1].json()
-        k = i[0]
-        k1 = k[0]
-        k2 = k[1]
-        retval.append({'from': k1,
-                       'to': k2,
-                       'bid': float(r['data']['buy']['value']),
-                       'ask': float(r['data']['sell']['value']),
-                       'last': float(r['data']['last']['value'])})
-    return retval
+    def item(r):
+        return {'from': r['last']['currency'],
+                'to': r['vol']['currency'],
+                'bid': float(r['buy']['value']),
+                'ask': float(r['sell']['value']),
+                'last': float(r['last']['value'])}
+    return [item(i.json()['data']) \
+            for i in grequests.imap([grequests.get(u) for u in urls])]
     
 #add tag
 def add_tag(d, tag):
