@@ -135,8 +135,8 @@ def anx(assets):
             pairs.append([k1, k2])
             urls.append('https://anxpro.com/api/2/%s/money/ticker' % k)
     def item(r):
-        return {'from': r['last']['currency'],
-                'to': r['vol']['currency'],
+        return {'from': r['vol']['currency'],
+                'to': r['last']['currency'],
                 'bid': float(r['buy']['value']),
                 'ask': float(r['sell']['value']),
                 'last': float(r['last']['value'])}
