@@ -1,6 +1,7 @@
 #!/bin/python3
 import requests
 import grequests
+import multiprocessing
 
 assets = ['USD', 'USDT', 'EUR', 'BTC', 'XRP', 'ETH', 'HKD', 'LTC', 'RUR',
           'CNY']
@@ -137,7 +138,7 @@ def add_tag(d, tag):
     d['to'] = d['to'] + ":" + tag
     return d
  
-for k,v in [
+tasks = [
     ['anx', anx],
     ['bitcashout', bitcashout],
     ['bitfinex', bitfinex],
@@ -145,8 +146,14 @@ for k,v in [
     ['gatecoin', gatecoin],
     ['poloniex', poloniex],
     ['bitstamp', bitstamp]
-    ]:
-    for j in v(assets):
+    ]
+
+def func(i):
+    return [i[0], i[1](assets)]
+
+p = multiprocessing.Pool()
+for k, v in p.imap_unordered(func, tasks):
+    for j in v:
         if j['from'] not in assets or j['to'] not in assets:
             continue
         j = add_tag(j,k)
