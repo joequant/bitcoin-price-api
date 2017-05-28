@@ -44,19 +44,20 @@ def gatecoin(assets):
 
 def poloniex(assets):
     """Poloniex assets"""
-    retval = []
-    r = requests.get('https://poloniex.com/public?command=returnTicker')
-    d = r.json()
-    for k, v in d.items():
+    d = requests.get('https://poloniex.com/public?command=returnTicker').json()
+    def in_assets(k):
         k1, k2 = k.split("_")
-        if k1 in assets and k2 in assets:
-            retval.append({'from': k2,
-                           'to': k1,
-                           'bid': v['highestBid'],
-                           'ask': v['lowestAsk'],
-                           'last': v['last']
-                           })
-    return retval
+        return k1 in assets and k2 in assets
+    def items(k, v):
+        k1, k2 = k.split("_")
+        return {'from': k2,
+                'to': k1,
+                'bid': v['highestBid'],
+                'ask': v['lowestAsk'],
+                'last': v['last']
+                }
+    return [ items(k,v) for k, v in d.items() if in_assets(k)]
+
 
 def bitfinex(assets):
     """Bitfinex assets"""
