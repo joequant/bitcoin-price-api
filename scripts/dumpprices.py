@@ -142,6 +142,40 @@ def anx(assets):
                 'last': float(r['last']['value'])}
     return [item(i.json()['data']) \
             for i in grequests.imap([grequests.get(u) for u in urls])]
+
+def kraken(assets):
+    pairs = []
+    urls = []
+    ft = []
+    transform = {
+        'XBT': 'BTC',
+        'XXBT': 'BTC',
+        'ZUSD': 'USD',
+        'XETH': 'ETH'
+        }
+    resp = requests.get('https://api.kraken.com/0/public/AssetPairs').json()
+    for k, v in resp['result'].items():
+        k1 = transform.get(v['base'], v['base'])
+        k2 = transform.get(v['quote'], v['quote'])
+        if '.d' in k:
+            continue
+        if k1 in assets and k2 in assets:
+            pairs.append(k)
+            ft.append([k1, k2])
+            urls.append('https://api.kraken.com/0/public/Ticker?pair=%s' % k)
+    rs = [grequests.get(u) for u in urls]
+    def item(i):
+        return {
+        'from': i[1][0],
+        'to' : i[1][1],
+        'bid' : float(i[2][i[0]]['b'][0]),
+        'ask' : float(i[2][i[0]]['a'][0]),
+        'last' : float(i[2][i[0]]['c'][0])}
+        
+    return [
+        item(i) \
+        for i in zip(pairs, ft,
+                     [ x.json()['result'] for x in grequests.map(rs)])]
     
 #add tag
 def add_tag(d, tag):
@@ -156,7 +190,8 @@ tasks = [
     ['btce', btc_e],
     ['gatecoin', gatecoin],
     ['poloniex', poloniex],
-    ['bitstamp', bitstamp]
+    ['bitstamp', bitstamp],
+    ['kraken', kraken]
     ]
 
 def func(i):
