@@ -203,4 +203,4 @@ for k, v in p.imap_unordered(func, tasks):
         if j['from'] not in assets or j['to'] not in assets:
             continue
         j = add_tag(j,k)
-        print(','.join(['bid-ask', j['from'], j['to'], str(j['bid']), str(j['ask'])]))
+        print(','.join(['bid-ask', j['from'], j['to'], str(j['bid']), str(j['ask']), str(j['last'])]))
