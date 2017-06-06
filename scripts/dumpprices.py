@@ -195,7 +195,10 @@ tasks = [
     ]
 
 def func(i):
-    return [i[0], i[1](assets)]
+    try:
+        return [i[0], i[1](assets)]
+    except:
+        return [i[0], []]
 
 p = multiprocessing.Pool()
 for k, v in p.imap_unordered(func, tasks):
