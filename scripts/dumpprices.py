@@ -176,6 +176,26 @@ def kraken(assets):
         item(i) \
         for i in zip(pairs, ft,
                      [ x.json()['result'] for x in grequests.map(rs)])]
+
+def btcchina(assets):
+    urls = []
+    pairs = []
+    for i in ['ltccny', 'btccny']:
+        k1 = i[0:3].upper()
+        k2 = i[3:].upper()
+        if k1 in assets and k2 in assets:
+            pairs.append([k1, k2])
+            urls.append('https://data.btcchina.com/data/ticker?market=' + i)
+    rs = [grequests.get(u) for u in urls]
+    retval = []
+    for i in zip(pairs, grequests.map(rs)):
+        r = i[1].json()['ticker']
+        retval.append({'from':i[0][0],
+                       'to':i[0][1],
+                       'bid': float(r['buy']),
+                       'ask': float(r['sell']),
+                       'last': float(r['last'])})
+    return retval
     
 #add tag
 def add_tag(d, tag):
@@ -184,6 +204,7 @@ def add_tag(d, tag):
     return d
  
 tasks = [
+    ['btcchina', btcchina],
     ['anx', anx],
     ['bitcashout', bitcashout],
     ['bitfinex', bitfinex],
