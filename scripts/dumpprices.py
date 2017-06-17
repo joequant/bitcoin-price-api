@@ -196,7 +196,38 @@ def btcchina(assets):
                        'ask': float(r['sell']),
                        'last': float(r['last'])})
     return retval
-    
+
+def huobi(assets):
+    urls = ['http://api.huobi.com/staticmarket/ticker_btc_json.js',
+            'http://api.huobi.com/staticmarket/ticker_ltc_json.js',
+            'http://api.huobi.com/usdmarket/ticker_btc_json.js',
+            'http://be.huobi.com/market/kline?symbol=ethcny&period=1min',
+            'http://be.huobi.com/market/depth?symbol=ethcny&type=step1']
+    rs = [grequests.get(u) for u in urls]
+    rp = [x.json() for x in grequests.map(rs)]
+    retval = []
+    retval.append({'from': 'BTC',
+                   'to': 'CNY',
+                   'bid': rp[0]['ticker']['buy'],
+                   'ask': rp[0]['ticker']['sell'],
+                   'last': rp[0]['ticker']['last']})
+    retval.append({'from': 'LTC',
+                   'to': 'CNY',
+                   'bid': rp[1]['ticker']['buy'],
+                   'ask': rp[1]['ticker']['sell'],
+                   'last': rp[1]['ticker']['last']})
+    retval.append({'from': 'BTC',
+                   'to': 'USD',
+                   'bid': rp[2]['ticker']['buy'],
+                   'ask': rp[2]['ticker']['sell'],
+                   'last': rp[2]['ticker']['last']})
+    retval.append({'from': 'ETH',
+                   'to': 'CNY',
+                   'bid': rp[4]['tick']['bids'][0][0],
+                   'ask': rp[4]['tick']['asks'][0][0],
+                   'last': rp[3]['tick']['close']})
+    return retval
+                 
 #add tag
 def add_tag(d, tag):
     d['from'] = d['from'] + ":" + tag
@@ -212,7 +243,8 @@ tasks = [
     ['gatecoin', gatecoin],
     ['poloniex', poloniex],
     ['bitstamp', bitstamp],
-    ['kraken', kraken]
+    ['kraken', kraken],
+    ['huobi', huobi]
     ]
 
 def func(i):
