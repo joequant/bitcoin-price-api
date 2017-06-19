@@ -94,7 +94,7 @@ def bitstamp(assets):
     urls = []
     symbols = ['btcusd', 'btceur',
               'eurusd', 'xrpusd', 'xrpeur',
-              'xrpbtc']
+              'xrpbtc', 'ltcusd', 'ltceur', 'ltcbtc']
     bitstamp_url = 'https://www.bitstamp.net/api/v2/ticker/'
     for s in symbols:
         k1 = s[0:3].upper()
