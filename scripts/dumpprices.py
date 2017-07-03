@@ -2,6 +2,7 @@
 import requests
 import grequests
 import multiprocessing
+import time
 
 assets = ['USD', 'USDT', 'EUR', 'BTC', 'XRP', 'ETH', 'HKD', 'LTC', 'RUR',
           'CNY', 'DASH', 'ZEC']
@@ -254,6 +255,7 @@ def func(i):
         return [i[0], []]
 
 p = multiprocessing.Pool()
+print("#" + time.strftime("%Y-%m-%d %H:%M:%S"))
 for k, v in p.imap_unordered(func, tasks):
     for j in v:
         if j['from'] not in assets or j['to'] not in assets:
