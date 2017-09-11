@@ -1,8 +1,11 @@
 #!/bin/python3
+# workaround from https://github.com/requests/requests/issues/3752
+import gevent.monkey
+gevent.monkey.patch_ssl()
 import requests
-import grequests
 import multiprocessing
 import time
+import grequests
 
 assets = ['USD', 'USDT', 'EUR', 'BTC', 'XRP', 'ETH', 'HKD', 'LTC', 'RUR',
           'CNY', 'DASH', 'ZEC', 'ETC', 'BCH']
@@ -240,7 +243,6 @@ tasks = [
     ['anx', anx],
     ['bitcashout', bitcashout],
     ['bitfinex', bitfinex],
-    ['btce', btc_e],
     ['gatecoin', gatecoin],
     ['poloniex', poloniex],
     ['bitstamp', bitstamp],
